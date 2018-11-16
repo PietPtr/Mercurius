@@ -1,0 +1,22 @@
+{
+    "projects": [
+        {
+            "name": "Example project",
+            "color": "#ffffff",
+            "fields": {
+                "path": "/"
+            },
+            "windows": {
+                "editor": "atom $path",
+                "terminal": "gnome-terminal $path"
+            },
+            "terminals": {
+                "runserver": {
+                    "command": "echo foo",
+                    "location": "$path"
+                }
+            },
+            "enabled": true
+        }
+    ]
+}

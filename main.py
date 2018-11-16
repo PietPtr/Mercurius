@@ -1,6 +1,6 @@
 import sys, os
 from PyQt5.QtWidgets import (QWidget, QToolTip,
-    QPushButton, QApplication, QLineEdit)
+    QPushButton, QApplication, QLineEdit, QLabel)
 from PyQt5.QtGui import QFont
 from PyQt5 import QtCore
 import json
@@ -9,9 +9,13 @@ from functools import partial
 
 PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 
-def start_project(project):
+def start_project(project, globalFields):
     global PATH
     commands = ""
+
+    for field, value in globalFields.items():
+        commands += field + "=" + value + ";\n"
+
     if 'fields' in project:
         for field, value in project['fields'].items():
             commands += field + "=" + value + ";\n"
@@ -38,8 +42,7 @@ class Starter(QWidget):
     def __init__(self):
         super().__init__()
 
-        with open(PATH + 'projects.json') as f:
-            self.projects = json.load(f)
+
 
         self.initUI()
         self.searchText = ""
@@ -50,28 +53,49 @@ class Starter(QWidget):
 
         counter = 0
         self.buttons = []
+        self.project = {}
 
-        sorted(self.projects['projects'], key=lambda project: project['name'])
+        error = None
+        with open(PATH + 'projects.json') as f:
+            try:
+                self.projects = json.load(f)
+            except Exception as e:
+                error = e
 
-        for project in self.projects['projects']:
-            if project["enabled"]:
-                btn = QPushButton(project['name'], self)
-                btn.clicked.connect(partial(start_project, project))
-                btn.resize(300, 30)
-                btn.move(0, (counter+1)*30)
-                btn.setStyleSheet("background-color: " + project['color'])
-                self.buttons.append({"button": btn, "color": project['color'], "name": project["name"]})
-                counter += 1
+        if error == None:
+            windowHeight = len(self.projects['projects']) * 30 + 30
+            self.projects['projects'] = \
+                    sorted(self.projects['projects'], key=lambda project: project['name'])
+            pprint(self.projects)
 
-        lineedit = QLineEdit(self)
-        lineedit.textChanged.connect(self.updateSearchText)
-        lineedit.resize(200, 20)
-        lineedit.move(50, 0)
-        lineedit.setFocus()
-        lineedit.show()
+            for project in self.projects['projects']:
+                if project["enabled"]:
+                    btn = QPushButton(project['name'], self)
+                    btn.clicked.connect(partial(start_project, project))
+                    btn.resize(300, 30)
+                    btn.move(0, (counter+1)*30)
+                    btn.setStyleSheet("background-color: " + project['color'])
+                    self.buttons.append({"button": btn, "color": project['color'], "name": project["name"]})
+                    counter += 1
 
-        windowHeight = counter*30 + 30
-        self.setGeometry(1920/2 - 150, 1080 / 2 - windowHeight/2, 300, windowHeight)
+            lineedit = QLineEdit(self)
+            lineedit.textChanged.connect(self.updateSearchText)
+            lineedit.resize(200, 20)
+            lineedit.move(50, 0)
+            lineedit.setFocus()
+            lineedit.show()
+            self.setGeometry(1920/2 - 150, 1080 / 2 - windowHeight/2, 300, windowHeight)
+        else:
+            self.setGeometry(300, 300, 400, 300)
+
+            print(error)
+            errLabel = QLabel(self)
+            errLabel.setText("Something is wrong with your configuration: \n" + str(error))
+            errLabel.setMinimumSize(400, 0)
+            errLabel.setWordWrap(True)
+
+            pass
+
         self.setWindowTitle('Float')
         self.show()
 
@@ -90,7 +114,7 @@ class Starter(QWidget):
                     if self.searchText in project['name'].lower()]
 
             if len(filtered) > 0:
-                start_project(filtered[0])
+                start_project(filtered[0], self.projects['globalfields'])
         elif event.key() == QtCore.Qt.Key_Escape:
             QApplication.instance().quit()
 

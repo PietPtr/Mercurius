@@ -1,10 +1,13 @@
 {
+    "globalfields": {
+        "home": "/home/user/",
+    },
     "projects": [
         {
             "name": "Example project",
             "color": "#ffffff",
             "fields": {
-                "path": "/"
+                "path": "$home"
             },
             "windows": {
                 "editor": "atom $path",

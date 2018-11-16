@@ -70,7 +70,8 @@ class Starter(QWidget):
         lineedit.setFocus()
         lineedit.show()
 
-        self.setGeometry(50, 16, 300, counter*30+30)
+        windowHeight = counter*30 + 30
+        self.setGeometry(1920/2 - 150, 1080 / 2 - windowHeight/2, 300, windowHeight)
         self.setWindowTitle('Float')
         self.show()
 

@@ -57,7 +57,7 @@ class Starter(QWidget):
             if project["enabled"]:
                 btn = QPushButton(project['name'], self)
                 btn.clicked.connect(partial(start_project, project))
-                btn.resize(100, 30)
+                btn.resize(300, 30)
                 btn.move(0, (counter+1)*30)
                 btn.setStyleSheet("background-color: " + project['color'])
                 self.buttons.append({"button": btn, "color": project['color'], "name": project["name"]})
@@ -65,11 +65,12 @@ class Starter(QWidget):
 
         lineedit = QLineEdit(self)
         lineedit.textChanged.connect(self.updateSearchText)
-        lineedit.move(0, 0)
+        lineedit.resize(200, 20)
+        lineedit.move(50, 0)
         lineedit.setFocus()
         lineedit.show()
 
-        self.setGeometry(300, 300, 300, 200)
+        self.setGeometry(50, 16, 300, counter*30+30)
         self.setWindowTitle('Float')
         self.show()
 

@@ -7,7 +7,10 @@ import json
 from pprint import pprint
 from functools import partial
 
+PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
+
 def start_project(project):
+    global PATH
     commands = ""
     if 'fields' in project:
         for field, value in project['fields'].items():
@@ -15,14 +18,17 @@ def start_project(project):
 
     if 'terminals' in project:
         for terminal, spec in project['terminals'].items():
-            rcpath = os.path.dirname(os.path.realpath(__file__)) + "/rc"
-            commands += "gnome-terminal " + spec['location'] + \
+            rcpath = PATH + "rc"
+            # cd = "cd " + spec['location'] + "; "
+            commands += "gnome-terminal --working-directory " + spec['location'] + \
                     " -e \"bash -c \\\" " + spec['command'] + \
                     "; exec bash --rcfile \\\"" + rcpath + "\\\" \\\"\"\n"
 
     if 'windows' in project:
         for window, command in project['windows'].items():
             commands += command + ";\n"
+
+    print(commands)
 
     os.system(commands)
     QApplication.instance().quit()
@@ -32,7 +38,7 @@ class Starter(QWidget):
     def __init__(self):
         super().__init__()
 
-        with open('projects.json') as f:
+        with open(PATH + 'projects.json') as f:
             self.projects = json.load(f)
 
         self.initUI()
@@ -83,6 +89,8 @@ class Starter(QWidget):
 
             if len(filtered) > 0:
                 start_project(filtered[0])
+        elif event.key() == QtCore.Qt.Key_Escape:
+            QApplication.instance().quit()
 
 
 

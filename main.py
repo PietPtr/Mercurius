@@ -36,7 +36,6 @@ class Starter(QWidget):
             windowHeight = len(self.config['projects']) * 30 + 30
             self.config['projects'] = \
                     sorted(self.config['projects'], key=lambda project: project['name'])
-            pprint(self.config)
 
             for project in self.config['projects']:
                 if "enabled" in project and project["enabled"]:
@@ -80,13 +79,17 @@ class Starter(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Return:
-            filtered = [project for project in self.config['projects']
-                    if self.searchText in project['name'].lower()]
-
-            if len(filtered) > 0:
-                self.start_project(filtered[0])
+            self.start_first()
         elif event.key() == QtCore.Qt.Key_Escape:
             QApplication.instance().quit()
+
+    def start_first(self):
+        filtered = [project for project in self.config['projects']
+                if self.searchText in project['name'].lower()]
+
+        if len(filtered) > 0:
+            self.start_project(filtered[0])
+
 
     def start_project(self, project):
         commands = ""

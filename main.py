@@ -7,7 +7,6 @@ import json
 from pprint import pprint
 from functools import partial
 
-
 class Starter(QWidget):
 
     def __init__(self):
@@ -33,10 +32,10 @@ class Starter(QWidget):
                 error = e
 
         if error == None:
-            windowHeight = len(self.config['projects']) * 30 + 30
+            numEnabledProject = len([x for x in self.config['projects'] if x['enabled']])
+            windowHeight = numEnabledProject * 30 + 30
             self.config['projects'] = \
                     sorted(self.config['projects'], key=lambda project: project['name'])
-            pprint(self.config)
 
             for project in self.config['projects']:
                 if "enabled" in project and project["enabled"]:
@@ -102,7 +101,6 @@ class Starter(QWidget):
         if 'terminals' in project:
             for terminal, spec in project['terminals'].items():
                 rcpath = self.PATH + "rc"
-                # cd = "cd " + spec['location'] + "; "
                 commands += "gnome-terminal --working-directory " + spec['location'] + \
                         " -e \"bash -c \\\" " + spec['command'] + \
                         "; exec bash --rcfile \\\"" + rcpath + "\\\" \\\"\"\n"
@@ -111,7 +109,7 @@ class Starter(QWidget):
             for window, command in project['windows'].items():
                 commands += command + ";\n"
 
-        print(commands)
+        commands = commands.replace("&;", "&")
 
         os.system(commands)
         QApplication.instance().quit()
